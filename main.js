@@ -84,29 +84,29 @@ d3.csv("colleges.csv", function(csv) {
 
 	// Add scatterplot points
     var temp1 = chart1G.selectAll("circle")
-	   .data(csv)
-	   .enter()
-	   .append("circle")
-       .classed("dot1", true)
-	   .attr("id", function(d, i) { return "g1-" + i; } )
-       .attr("stroke", "black")
-       .attr("stroke-width", 2)
-       .attr("fill", "white")
-       .attr("fill-opacity", 0)
-	   .attr("cx", function(d) { 
+	    .data(csv)
+	    .enter()
+	    .append("circle")
+        .classed("dot1", true)
+	    .attr("id", function(d, i) { return "g1-" + i; } )
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("fill", "white")
+        .attr("fill-opacity", 0)
+	    .attr("cx", function(d) { 
             return selectedXAxisScale(d[selectedXAxisName]);
         })
-	   .attr("cy", function(d) { 
+	    .attr("cy", function(d) { 
             return yScale(d["Average Cost"]);
         })
-	   .attr("r", function(d) {
+	    .attr("r", function(d) {
            if (d[selectedXAxisName] == 0 || d["Average Cost"] == 0) {
                return 0;
            } else {
                return 5;
            }
-       })
-	   .on("click", function(d, i) {
+        })
+	    .on("click", function(d, i) {
             if (lastSelectedDot != 5000) {
                 d3.select("#g1-" + lastSelectedDot).classed("selected", false);
             }
@@ -122,7 +122,7 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#medFamInc").text(function(k) { return hasField(d, "Median Family Income"); });
             d3.select("#medDebtGrad").text(function(k) { return hasField(d, "Median Debt on Graduation"); });
             lastSelectedDot = i;
-       });
+        });
 
 
     // Add x-axis
