@@ -19,6 +19,11 @@ body {
 	margin-top: 30px;
 	margin-left: 20px;
 }
+.hovered {
+	stroke: black;
+    fill:lightblue;
+    fill-opacity: 100;
+}
 .selected {
 	stroke: black;
     fill:lightgreen;

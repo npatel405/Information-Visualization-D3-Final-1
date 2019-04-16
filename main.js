@@ -4,7 +4,7 @@ var width = 1000;
 var height = 600;
 
 var lastSelectedDot = 5000;
-var circleBorder = d3.rgb("#424242");
+var circleBorder = d3.rgb("#606060");
 
 const xAxisVals = {
     ACTMED: "ACT Median",
@@ -106,6 +106,12 @@ d3.csv("colleges.csv", function(csv) {
            } else {
                return 5;
            }
+        })
+        .on("mouseenter", function(d) {
+            d3.select(this).classed('hovered', true);
+        })
+        .on("mouseleave", function(d) {
+            d3.select(this).classed('hovered', false);
         })
 	    .on("click", function(d, i) {
             if (lastSelectedDot != 5000) {
