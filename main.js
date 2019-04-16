@@ -78,6 +78,10 @@ d3.csv("colleges.csv", function(csv) {
                     .append('g');
 
 
+    function hasField(d, field) {
+        return (d[field] == 0 ? "No value given" : d[field]);
+    }
+
 	// Add scatterplot points
     var temp1 = chart1G.selectAll("circle")
 	   .data(csv)
@@ -100,21 +104,21 @@ d3.csv("colleges.csv", function(csv) {
            }
        })
 	   .on("click", function(d, i) {
-           if (lastSelectedDot != 5000) {
-               d3.select("#g1-" + lastSelectedDot).classed("selected", false);
-           }
-           d3.select("#g1-" + i).classed("selected", true);
-           d3.select("#name").text(d.Name);
-           d3.select("#avgCost").text(d["Average Cost"]);
-           d3.select("#actMed").text(d["ACT Median"]);
-           d3.select("#satAvg").text(d["SAT Average"]);
-           d3.select("#admRate").text(d["Admission Rate"]);
-           d3.select("#avgFacSal").text(d["Average Faculty Salary"]);
-           d3.select("#avgFamInc").text(d["Average Family Income"]);
-           d3.select("#meanEarn8").text(d["Mean Earnings 8 years After Entry"]);
-           d3.select("#medFamInc").text(d["Median Family Income"]);
-           d3.select("#medDebtGrad").text(d["Median Debt on Graduation"]);
-           lastSelectedDot = i;
+            if (lastSelectedDot != 5000) {
+                d3.select("#g1-" + lastSelectedDot).classed("selected", false);
+            }
+            d3.select("#g1-" + i).classed("selected", true);
+            d3.select("#name").text(d.Name);
+            d3.select("#avgCost").text(function(k) { return hasField(d, "Average Cost"); });
+            d3.select("#actMed").text(function(k) { return hasField(d, "ACT Median"); });
+            d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
+            d3.select("#admRate").text(function(k) { return hasField(d, "Admission Rate"); });
+            d3.select("#avgFacSal").text(function(k) { return hasField(d, "Average Faculty Salary"); });
+            d3.select("#avgFamInc").text(function(k) { return hasField(d, "Average Family Income"); });
+            d3.select("#meanEarn8").text(function(k) { return hasField(d, "Mean Earnings 8 years After Entry"); });
+            d3.select("#medFamInc").text(function(k) { return hasField(d, "Median Family Income"); });
+            d3.select("#medDebtGrad").text(function(k) { return hasField(d, "Median Debt on Graduation"); });
+            lastSelectedDot = i;
        });
 
 
