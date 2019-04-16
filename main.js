@@ -1,43 +1,76 @@
 // Samuel Shapiro & Nick Patel
 
-var width = 500;
-var height = 500;
+var width = 1000;
+var height = 600;
 
-var lastSelectedDot = 500;
+var lastSelectedDot = 5000;
 
-d3.csv("calvinCollegeSeniorScores.csv", function(csv) {
+const xAxisVals = {
+    ACTMED: "ACT Median",
+    SATAVG: "SAT Average",
+    ADMRATE: "Admission Rate",
+    AVGFACSAL: "Average Faculty Salary",
+    AVGFAMINC: "Average Family Income",
+    MEANEARN8: "Mean Earnings 8 years After Entry",
+    MEDFAMINC: "Median Family Income",
+    MEDDEBTGRAD: "Median Debt on Graduation"
+}
+
+// Variable to represent the name of the currently selected axis
+var selectedXAxisName = xAxisVals.AVGFAMINC;
+
+d3.csv("colleges.csv", function(csv) {
     for (var i = 0; i < csv.length; ++i) {
-		csv[i].GPA = Number(csv[i].GPA);
-		csv[i].SATM = Number(csv[i].SATM);
-		csv[i].SATV = Number(csv[i].SATV);
-		csv[i].ACT = Number(csv[i].ACT);
+        csv[i]["Average Cost"] = Number(csv[i]["Average Cost"]);
+        csv[i]["ACT Median"] = Number(csv[i]["ACT Median"]);
+        csv[i]["SAT Average"] = Number(csv[i]["SAT Average"]);
+        csv[i]["Admission Rate"] = Number(csv[i]["Admission Rate"]);
+        csv[i]["Average Faculty Salary"] = Number(csv[i]["Average Faculty Salary"]);
+        csv[i]["Average Family Income"] = Number(csv[i]["Average Family Income"]);
+        csv[i]["Mean Earnings 8 years After Entry"] = Number(csv[i]["Mean Earnings 8 years After Entry"]);
+        csv[i]["Median Family Income"] = Number(csv[i]["Median Family Income"]);
+        csv[i]["Median Debt on Graduation"] = Number(csv[i]["Median Debt on Graduation"]);
     }
-    var satmExtent = d3.extent(csv, function(row) { return row.SATM; });
-    var satvExtent = d3.extent(csv, function(row) { return row.SATV; });
-    var actExtent = d3.extent(csv,  function(row) { return row.ACT;  });
-    var gpaExtent = d3.extent(csv,  function(row) {return row.GPA;   });
+
+    var avgCostExtent = d3.extent(csv, function(row) { return row["Average Cost"]; });
+    var actMedExtent = d3.extent(csv, function(row) { return row["ACT Median"]; });
+    var satAvgExtent = d3.extent(csv, function(row) { return row["SAT Average"]; });
+    var admRateExtent = d3.extent(csv, function(row) { return row["Admission Rate"]; });
+    var avgFacSalExtent = d3.extent(csv, function(row) { return row["Average Faculty Salary"]; });
+    var avgFamIncExtent = d3.extent(csv, function(row) { return row["Average Family Income"]; });
+    var meanEarn8Extent = d3.extent(csv, function(row) { return row["Mean Earnings 8 years After Entry"]; });
+    var medFamIncExtent = d3.extent(csv, function(row) { return row["Median Family Income"]; });
+    var medDebtGradExtent = d3.extent(csv, function(row) { return row["Median Debt on Graduation"]; });
 
 
-    var satExtents = {
-	"SATM": satmExtent,
-	"SATV": satvExtent
-    };
-
+    // Axis scale setup
+    var yScale = d3.scaleLinear().domain(avgCostExtent).range([570, 30]);
+    var xScaleAct = d3.scaleLinear().domain(actMedExtent).range([50, 970]);
+    var xScaleSat = d3.scaleLinear().domain(satAvgExtent).range([50, 970]);
+    var xScaleAdm = d3.scaleLinear().domain(admRateExtent).range([50, 970]);
+    var xScaleFac = d3.scaleLinear().domain(avgFacSalExtent).range([50, 970]);
+    var xScaleFamAvg = d3.scaleLinear().domain(avgFamIncExtent).range([50, 970]);
+    var xScaleMean8 = d3.scaleLinear().domain(meanEarn8Extent).range([50, 970]);
+    var xScaleFamMed = d3.scaleLinear().domain(medFamIncExtent).range([50, 970]);
+    var xScaleDebt = d3.scaleLinear().domain(medDebtGradExtent).range([50, 970]);
 
     // Axis setup
-    var xScale = d3.scaleLinear().domain(satmExtent).range([50, 470]);
-    var yScale = d3.scaleLinear().domain(satvExtent).range([470, 30]);
-
-    var xScale2 = d3.scaleLinear().domain(actExtent).range([50, 470]);
-    var yScale2 = d3.scaleLinear().domain(gpaExtent).range([470, 30]);
-
-    var xAxis = d3.axisBottom().scale(xScale);
     var yAxis = d3.axisLeft().scale(yScale);
+    var xAxisAct = d3.axisBottom().scale(xScaleAct);
+    var xAxisSat = d3.axisBottom().scale(xScaleSat);
+    var xAxisAdm = d3.axisBottom().scale(xScaleAdm);
+    var xAxisFac = d3.axisBottom().scale(xScaleFac);
+    var xAxisFamAvg = d3.axisBottom().scale(xScaleFamAvg);
+    var xAxisMean8 = d3.axisBottom().scale(xScaleMean8);
+    var xAxisFamMed = d3.axisBottom().scale(xScaleFamMed);
+    var xAxisDebt = d3.axisBottom().scale(xScaleDebt);
 
-    var xAxis2 = d3.axisBottom().scale(xScale2);
-    var yAxis2 = d3.axisLeft().scale(yScale2);
+    // Variables to represent the currently selected axis and axis scale
+    var selectedXAxisScale = xScaleFamAvg;
+    var selectedXAxis = xAxisFamAvg;
 
-    //Create SVGs and <g> elements as containers for charts
+
+    // Create SVGs and <g> elements as containers for charts
     var chart1G = d3.select("#chart1")
 	                .append("svg:svg")
 	                .attr("width",width)
@@ -45,126 +78,7 @@ d3.csv("calvinCollegeSeniorScores.csv", function(csv) {
                     .append('g');
 
 
-    var chart2G = d3.select("#chart2")
-	                .append("svg:svg")
-	                .attr("width",width)
-	                .attr("height",height)
-                    .append('g');
-
-
-	 /******************************************
-
-		BRUSHING CODE
-
-	 ******************************************/
-
-    var brushContainer1G = chart1G.append('g')
-        .attr('id', 'brush-container1');
-
-    var brushContainer2G = chart2G.append('g')
-        .attr('id', 'brush-container2');
-
-    var brush1 = d3.brush()
-        .extent([[-10, -10], [width + 10, height + 10]]);
-
-    var brush2 = d3.brush()
-        .extent([[-10, -10], [width + 10, height + 10]]);
-
-    brush1.on('start', handleBrushStart1)
-        .on('brush', handleBrushMove1)
-        .on('end', handleBrushEnd1);
-
-    brush2.on('start', handleBrushStart2)
-        .on('brush', handleBrushMove2)
-        .on('end', handleBrushEnd2);
-
-    brushContainer1G.call(brush1);
-    brushContainer2G.call(brush2);
-
-    function handleBrushStart1() {
-        console.log('%cBrush 1 START!!', 'color: green');
-        brushContainer2G.call(brush1.move, null);
-    }
-
-    function handleBrushStart2() {
-        console.log('%cBrush 2 START!!', 'color: green');
-        brushContainer1G.call(brush2.move, null);
-    }
-
-    function handleBrushMove1() {
-        console.log('%cBrush 1 MOVING....', 'color: blue');
-
-        var sel = d3.event.selection;
-        if (!sel) {
-            // sel is null when we clear the brush
-            return;
-        }
-
-        // The d3.event.selection contains the boundary of your current brush. It is a nested array that has
-        //  the form [[x0, y0], [x1, y1]], where (x0, y0) is the coordinate of the top-left corner and
-        //  (x1, y1) is the coordinate of the bottom right corner.
-
-        // You can also think is as [[left, top], [right, bottom]] if that is more intuitive to you
-
-        // Get the boundaries.
-        var [[left, top], [right, bottom]] = sel;
-        console.log({left, top, right, bottom})
-
-        // Check all the dots in first graph, highlight the ones inside the brush
-        d3.selectAll('.dot2')
-            .classed('selected2', function(d) {
-                var cx = xScale(d['SATM']);
-                var cy = yScale(d['SATV']);
-                return left <= cx && cx <= right && top <= cy && cy <= bottom;
-            });
-    }
-
-    function handleBrushMove2() {
-        console.log('%cBrush 2 MOVING....', 'color: blue');
-
-        var sel = d3.event.selection;
-        if (!sel) {
-            // sel is null when we clear the brush
-            return;
-        }
-
-        // Get the boundaries.
-        var [[left, top], [right, bottom]] = sel;
-        console.log({left, top, right, bottom})
-
-        // Check all the dots in second graph, highlight the ones inside the brush
-        d3.selectAll('.dot1')
-            .classed('selected', function(d) {
-                var cx = xScale2(d['ACT']);
-                var cy = yScale2(d['GPA']);
-                return left <= cx && cx <= right && top <= cy && cy <= bottom;
-            });
-    }
-
-    function handleBrushEnd1() {
-        console.log('%cBrush 1 END!!', 'color: red');
-
-        // Clear existing styles when the brush is reset (click)
-        if (!d3.event.selection) {
-            clearSelected();
-        }
-    }
-
-    function handleBrushEnd2() {
-        console.log('%cBrush 2 END!!', 'color: red');
-
-        // Clear existing styles when the brush is reset (click)
-        if (!d3.event.selection) {
-            clearSelected();
-        }
-    }
-
-    function clearSelected() {
-        d3.selectAll('.dot1').classed('selected', false);
-        d3.selectAll('.dot2').classed('selected2', false);
-    }
-
-	 //add scatterplot points
+	// Add scatterplot points
     var temp1 = chart1G.selectAll("circle")
 	   .data(csv)
 	   .enter()
@@ -172,60 +86,53 @@ d3.csv("calvinCollegeSeniorScores.csv", function(csv) {
        .classed("dot1", true)
 	   .attr("id", function(d, i) { return "g1-" + i; } )
 	   .attr("stroke", "black")
-	   .attr("cx", function(d) { return xScale(d.SATM); })
-	   .attr("cy", function(d) { return yScale(d.SATV); })
-	   .attr("r", 5)
-	   .on("click", function(d, i) {
-           if (lastSelectedDot != 500) {
-               d3.select("#g1-" + lastSelectedDot).classed("selected", false);
-               d3.select("#g2-" + lastSelectedDot).classed("selected", false);
+	   .attr("cx", function(d) { 
+            return selectedXAxisScale(d[selectedXAxisName]);
+        })
+	   .attr("cy", function(d) { 
+            return yScale(d["Average Cost"]);
+        })
+	   .attr("r", function(d) {
+           if (d[selectedXAxisName] == 0 || d["Average Cost"] == 0) {
+               return 0;
+           } else {
+               return 5;
            }
-           d3.select("#g2-" + i).classed("selected", true);
-           d3.select("#satm").text(d.SATM);
-           d3.select("#satv").text(d.SATV);
-           d3.select("#act").text(d.ACT);
-           d3.select("#gpa").text(d.GPA);
-           lastSelectedDot = i;
-       });
-
-    var temp2 = chart2G.selectAll("circle")
-	   .data(csv)
-	   .enter()
-	   .append("circle")
-       .classed("dot2", true)
-	   .attr("id", function(d, i) { return "g2-" + i; } )
-	   .attr("stroke", "black")
-	   .attr("cx", function(d) { return xScale2(d.ACT); })
-	   .attr("cy", function(d) { return yScale2(d.GPA); })
-	   .attr("r", 5)
+       })
 	   .on("click", function(d, i) {
-           if (lastSelectedDot != 500) {
+           if (lastSelectedDot != 5000) {
                d3.select("#g1-" + lastSelectedDot).classed("selected", false);
-               d3.select("#g2-" + lastSelectedDot).classed("selected", false);
            }
            d3.select("#g1-" + i).classed("selected", true);
-           d3.select("#satm").text(d.SATM);
-           d3.select("#satv").text(d.SATV);
-           d3.select("#act").text(d.ACT);
-           d3.select("#gpa").text(d.GPA);
+           d3.select("#name").text(d.Name);
+           d3.select("#avgCost").text(d["Average Cost"]);
+           d3.select("#actMed").text(d["ACT Median"]);
+           d3.select("#satAvg").text(d["SAT Average"]);
+           d3.select("#admRate").text(d["Admission Rate"]);
+           d3.select("#avgFacSal").text(d["Average Faculty Salary"]);
+           d3.select("#avgFamInc").text(d["Average Family Income"]);
+           d3.select("#meanEarn8").text(d["Mean Earnings 8 years After Entry"]);
+           d3.select("#medFamInc").text(d["Median Family Income"]);
+           d3.select("#medDebtGrad").text(d["Median Debt on Graduation"]);
            lastSelectedDot = i;
        });
 
 
-
-    chart1G // or something else that selects the SVG element in your visualizations
+    // Add x-axis
+    chart1G
 		.append("g") // create a group node
-		.attr("transform", "translate(0, "+ (width - 30) + ")")
-		.call(xAxis) // call the axis generator
+		.attr("transform", "translate(0, "+ (height - 30) + ")")
+		.call(selectedXAxis) // call the axis generator
 		.append("text")
         .attr("fill", "black")
 		.attr("class", "label")
 		.attr("x", width - 16)
 		.attr("y", -6)
 		.style("text-anchor", "end")
-		.text("SATM");
+		.text(selectedXAxisName);
 
-    chart1G // or something else that selects the SVG element in your visualizations
+    // Add y-axis
+    chart1G
 		.append("g") // create a group node
 		.attr("transform", "translate(50, 0)")
 		.call(yAxis)
@@ -236,30 +143,5 @@ d3.csv("calvinCollegeSeniorScores.csv", function(csv) {
 		.attr("y", 6)
 		.attr("dy", ".71em")
 		.style("text-anchor", "end")
-		.text("SATV");
-
-    chart2G // or something else that selects the SVG element in your visualizations
-		.append("g") // create a group node
-		.attr("transform", "translate(0, "+ (width - 30) + ")")
-		.call(xAxis2)
-		.append("text")
-        .attr("fill", "black")
-		.attr("class", "label")
-		.attr("x", width - 16)
-		.attr("y", -6)
-		.style("text-anchor", "end")
-		.text("ACT");
-
-    chart2G // or something else that selects the SVG element in your visualizations
-		.append("g") // create a group node
-		.attr("transform", "translate(50, 0)")
-		.call(yAxis2)
-		.append("text")
-        .attr("fill", "black")
-		.attr("class", "label")
-		.attr("transform", "rotate(-90)")
-		.attr("y", 6)
-		.attr("dy", ".71em")
-		.style("text-anchor", "end")
-		.text("GPA");
-	});
+		.text("Average Cost (USD)");
+});
