@@ -21,5 +21,6 @@ body {
 }
 .selected {
 	stroke: black;
-	fill:gold;
+    fill:gold;
+    fill-opacity: 100;
 }
