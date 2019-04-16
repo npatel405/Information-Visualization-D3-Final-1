@@ -1,0 +1,16 @@
+body {
+    font: 12px sans-serif;
+}
+.tick > line {
+    fill: none;
+    stroke: black;
+}
+.tick > text {
+    fill: black;
+}
+#wrapper {
+	clear:both;
+}
+#chart1 {
+    float:center;
+}
