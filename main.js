@@ -4,6 +4,7 @@ var width = 1000;
 var height = 600;
 
 var lastSelectedDot = 5000;
+var circleBorder = d3.rgb("#424242");
 
 const xAxisVals = {
     ACTMED: "ACT Median",
@@ -89,7 +90,7 @@ d3.csv("colleges.csv", function(csv) {
 	    .append("circle")
         .classed("dot1", true)
 	    .attr("id", function(d, i) { return "g1-" + i; } )
-        .attr("stroke", "black")
+        .attr("stroke", circleBorder)
         .attr("stroke-width", 2)
         .attr("fill", "white")
         .attr("fill-opacity", 0)
