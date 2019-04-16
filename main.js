@@ -90,6 +90,7 @@ d3.csv("colleges.csv", function(csv) {
        .classed("dot1", true)
 	   .attr("id", function(d, i) { return "g1-" + i; } )
        .attr("stroke", "black")
+       .attr("stroke-width", 2)
        .attr("fill", "white")
        .attr("fill-opacity", 0)
 	   .attr("cx", function(d) { 
