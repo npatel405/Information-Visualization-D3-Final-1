@@ -229,7 +229,7 @@ d3.csv("colleges.csv", function(csv) {
                 .duration(d => 1000)
                 .call(selectedXAxis);
 
-            chart1G.select("#xaxislabel")
+            chart1G.select("#xaxistitle")
                 .transition()
                 .duration(d => 1000)
                 .text(function(d) {
