@@ -19,6 +19,17 @@ body {
 	margin-top: 30px;
 	margin-left: 20px;
 }
+.xaxisdropdown {
+    float: left;
+    clear: both;
+    margin-left: 430px;
+}
+.xaxisbutton {
+    float: left;
+    clear: both;
+    margin-left: 475px;
+    margin-top: 10px;
+}
 .hovered {
 	stroke: black;
     fill:lightblue;
