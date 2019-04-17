@@ -59,10 +59,16 @@ d3.csv("colleges.csv", function(csv) {
     var xAxisFamMed = d3.axisBottom().scale(xScaleFamMed);
     var xAxisDebt = d3.axisBottom().scale(xScaleDebt);
 
+    /*
+     *
+     * BEGINNING OF CODE FOR FIRST GRAPH
+     *
+     */
+
+
     // Variables to represent the currently selected axis and axis scale
     var selectedXAxisScale = xScaleFamAvg;
     var selectedXAxis = xAxisFamAvg;
-
 
     // Create SVGs and <g> elements as containers for charts
     var chart1G = d3.select("#chart1")
@@ -159,7 +165,7 @@ d3.csv("colleges.csv", function(csv) {
         .attr("id", "xaxislabel")
         .attr("class", "xaxisdropdown")
         .style("border", "1px solid black")
-        .on('change', onchange)
+        .on('change', chart1OnChange)
 
     // Fill dropdown with colors
     var options = select
@@ -170,7 +176,7 @@ d3.csv("colleges.csv", function(csv) {
         .property("selected", function(d) { return d === "Average Family Income"; });
 
     // Function to change selected color if dropdown selection is changed
-    function onchange() {
+    function chart1OnChange() {
         selectedXAxisName = d3.select("#xaxislabel").property("value");
         switch (d3.select("#xaxislabel").property("value")) {
             case "ACT Median":
@@ -251,4 +257,10 @@ d3.csv("colleges.csv", function(csv) {
                     return (d[selectedXAxisName] == 0 || d["Average Cost"] == 0) ? 0 : 5;
                 });
         });
+
+    /*
+     * 
+     * END OF CODE FOR FIRST GRAPH
+     * 
+     */
 });
