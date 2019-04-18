@@ -114,6 +114,7 @@ d3.csv("colleges.csv", function(csv) {
             }
             d3.select("#g1-" + i).classed("selected", true);
             d3.select("#name").text(d.Name);
+            d3.select("#region").text(d.Region);
             d3.select("#avgCost").text(function(k) { return hasField(d, "Average Cost"); });
             d3.select("#actMed").text(function(k) { return hasField(d, "ACT Median"); });
             d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
