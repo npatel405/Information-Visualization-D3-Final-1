@@ -322,7 +322,7 @@ d3.csv("colleges.csv", function(csv) {
      * 
      */
 
-     /*
+    /*
      *
      * BEGINNING OF CODE FOR SECOND GRAPH
      *
