@@ -3,12 +3,13 @@
 var width = 1000;
 var height = 600;
 
-var pwidth = 500;
-var pheight = 500;
+var pwidth = 510;
+var pheight = 510;
 var radius = 250;
 
 var lastSelectedDot = 5000;
 var circleBorder = d3.rgb("#606060");
+var pieCount = 0;
 
 var piecolor = d3.scaleOrdinal()
     .domain(["% White", "% Black", "% Hispanic", "% Asian", "% American Indian", "% Pacific Islander", "% Biracial", "% Nonresident", "% Other"])
@@ -63,7 +64,7 @@ d3.csv("colleges.csv", function(csv) {
     var bipercent = 0;
     var nonpercent = 0;
     var other = 0;
-    var diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islanders","percentage": pacificpercent}, 
+    var diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islander","percentage": pacificpercent}, 
         {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Other","percentage": other}];
 
 
@@ -164,9 +165,14 @@ d3.csv("colleges.csv", function(csv) {
             bipercent = d.Biracial;
             nonpercent = d.NonresidentAliens;
             other = d.Other;
-            diversity = {"% White": whitepercent,"% Black": blackpercent, "% Hispanic":hispanicpercent, "% Asian": asianpercent, "% American Indian": americanpercent, "% Pacific Islanders": pacificpercent, 
+            diversity = {"% White": whitepercent,"% Black": blackpercent, "% Hispanic":hispanicpercent, "% Asian": asianpercent, "% American Indian": americanpercent, "% Pacific Islander": pacificpercent, 
                 "% Biracial": bipercent, "% Nonresident": nonpercent, "% Other": other};
-            createPieChart(diversity);
+            if (pieCount != 0) {
+                updatePie(diversity);
+            } else {
+                createPieChart(diversity);
+                pieCount++;
+            }
             other = 0;
 
         });
@@ -316,50 +322,57 @@ d3.csv("colleges.csv", function(csv) {
      *
      */
 
-    var svg = d3.select('#piechart')
+    var pieChart = d3.select('#piechart')
         .append("svg")
             .attr("width", pwidth)
             .attr("height", pheight)
         .append("g")
-            .attr("transform", "translate(" + pwidth / 2 + "," + pheight / 2 + ")");
+            .attr("transform", "translate(" + pwidth / 2 + ", " + pheight / 2 + ")");
+
+    var arc = d3.arc()
+        .outerRadius(radius)
+        .innerRadius(0);
+        
+    var labelArc = d3.arc()
+        .outerRadius(radius - 100)
+        .innerRadius(radius - 100);
+
+    var pie = d3.pie()
+        .value(function(d) { return d.value; })
+        .sort(function(a,b) { return d3.ascending(a.key, b.key); });
 
     function createPieChart(data) {
         console.log(data)
-        var pie = d3.pie()
-            .value(function(d) {return d.value; })
-            .sort(function(a,b) {return d3.ascending(a.key, b.key);})
-        var readydata = pie(d3.entries(data))
-        console.log(data);
-        console.log(readydata);
-        var u = svg.selectAll("path")
-            .data(readydata);
+        var readydata0 = pie(d3.entries(data));
 
-        u.enter()
-            .append('path')
-                .attr("slice", true)
-            .merge(u)
-            .transition()
-            .duration(1000)
-            .attr('d', d3.arc()
-                .innerRadius(0)
-                .outerRadius(radius)
-            )
-            .attr('fill', function(d){ return(piecolor(d.data.key)) })
+        var pieArcs = pieChart.selectAll("arc")
+            .data(readydata0)
+            .enter().append("g")
+            .attr("class", "arc");
+
+        pieArcs.append("path")
+            .attr("d", arc)
             .attr("stroke", "black")
-            .style("stroke-width", "2px")
-            .style("opacity", 1);
+            .style("stroke-width", "1px")
+            .style("opacity", 1)
+            .style("fill", function(d) { return piecolor(d.data.key); });
 
-            u.selectAll("#slice")
-                .append("text")
-                .attr("transform", function(d) {
-                    return "translate(" + d3.arc().centroid(d) + ")";
-                })
-                .text(function(d) { return d.data.key;})
-                .style("fill", "#fff");
+        pieArcs.append("text")
+            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+            .text(function(d) { return d.data.key;})
+            .style("fill", "#fff");
         
-        u.exit().remove();
-    }
+        pieArcs.exit().remove();
+    };
 
+    function updatePie(data) {
+        console.log(data)
+        var readydata1 = pie(d3.entries(data));
+	    path = d3.select("#piechart").selectAll("path").data(readydata1); // Compute the new angles
+	    path.attr("d", arc); // redrawing the path
+	    pieChart.selectAll("text").data(readydata1).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; });
+    }
+    
     /*
      * 
      * END OF CODE FOR SECOND GRAPH
