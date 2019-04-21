@@ -40,3 +40,7 @@ body {
     fill:lightgreen;
     fill-opacity: 100;
 }
+.slice {
+    font-size: 16pt;
+    font-family: Arial;
+}

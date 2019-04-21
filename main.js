@@ -11,9 +11,8 @@ var lastSelectedDot = 5000;
 var circleBorder = d3.rgb("#606060");
 
 var piecolor = d3.scaleOrdinal()
-    .domain(["% White", "% Black", "% Hispanic", "% Asian", "% American Indian", "% Pacific Islander", "% Biracial", "% Nonresident", "% Mixed/Other"])
-    .range(["#e8eaf6","#c5cae9", "#9fa8da", "#7986cb","#5c6bc0", "#3f51b5", "#3949ab", "#303f9f", "#1a237e"]);
-    //.range(d3.schemeDark2);
+    .domain(["% White", "% Black", "% Hispanic", "% Asian", "% American Indian", "% Pacific Islander", "% Biracial", "% Nonresident", "% Other"])
+    .range(["#FF0000","#00FF00", "#0000FF", "#FFFF00","#00FFFF", "#FF00FF", "#808080", "#008000", "#008080"]);
 
 var xAxisValArr = ["ACT Median", "SAT Average", "Admission Rate", "Average Faculty Salary",
     "Average Family Income", "Mean Earnings 8 years After Entry", "Median Family Income",
@@ -41,7 +40,7 @@ d3.csv("colleges.csv", function(csv) {
         csv[i]["PacificIslander"] = Number(csv[i]["% Pacific Islander"])*100;
         csv[i]["Biracial"] = Number(csv[i]["% Biracial"])*100;
         csv[i]["NonresidentAliens"] = Number(csv[i]["% Nonresident Aliens"])*100;
-        csv[i]["Mixed"] = (1 - (Number(csv[i]["% Nonresident Aliens"]) + Number(csv[i]["% Biracial"]) + Number(csv[i]["% Pacific Islander"]) + Number(csv[i]["% American Indian"]) + 
+        csv[i]["Other"] = (1 - (Number(csv[i]["% Nonresident Aliens"]) + Number(csv[i]["% Biracial"]) + Number(csv[i]["% Pacific Islander"]) + Number(csv[i]["% American Indian"]) + 
             Number(csv[i]["% Asian"]) + Number(csv[i]["% Hispanic"]) + Number(csv[i]["% Black"]) + Number(csv[i]["% White"])))*100;
     }
 
@@ -63,9 +62,9 @@ d3.csv("colleges.csv", function(csv) {
     var pacificpercent = 0;
     var bipercent = 0;
     var nonpercent = 0;
-    var mixed = 0;
+    var other = 0;
     var diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islanders","percentage": pacificpercent}, 
-        {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Mixed/Other","percentage": mixed}];
+        {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Other","percentage": other}];
 
 
     // Axis scale setup
@@ -156,8 +155,6 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#medFamInc").text(function(k) { return hasField(d, "Median Family Income"); });
             d3.select("#medDebtGrad").text(function(k) { return hasField(d, "Median Debt on Graduation"); });
             lastSelectedDot = i;
-            console.log(this);
-            // console.log(d.Mixed);
             whitepercent = d.White;
             blackpercent = d.Black;
             hispanicpercent = d.Hispanic;
@@ -166,12 +163,11 @@ d3.csv("colleges.csv", function(csv) {
             pacificpercent = d.PacificIslander;
             bipercent = d.Biracial;
             nonpercent = d.NonresidentAliens;
-            mixed = d.Mixed;
+            other = d.Other;
             diversity = {"% White": whitepercent,"% Black": blackpercent, "% Hispanic":hispanicpercent, "% Asian": asianpercent, "% American Indian": americanpercent, "% Pacific Islanders": pacificpercent, 
-                "% Biracial": bipercent, "% Nonresident": nonpercent, "% Mixed/Other": mixed};
-            // diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islanders","percentage": pacificpercent}, 
-            //     {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Mixed/Other","percentage": mixed}];
+                "% Biracial": bipercent, "% Nonresident": nonpercent, "% Other": other};
             createPieChart(diversity);
+            other=0;
 
         });
 
@@ -332,6 +328,7 @@ d3.csv("colleges.csv", function(csv) {
         u
             .enter()
             .append('path')
+                .attr("slice", true)
             .merge(u)
             .transition()
             .duration(1000)
@@ -340,11 +337,18 @@ d3.csv("colleges.csv", function(csv) {
                 .outerRadius(radius)
             )
             .attr('fill', function(d){ return(piecolor(d.data.key)) })
-            .attr("stroke", "white")
+            .attr("stroke", "black")
             .style("stroke-width", "2px")
             .style("opacity", 1)
-            .text(function(d){return d.data.key})
 
+            u.selectAll("#slice")
+                .append("text")
+                .attr("transform", function(d) {
+                    return "translate(" + d3.arc().centroid(d) + ")";
+                })
+                .text(function(d) { return d.data.key;})
+                .style("fill", "#fff");
+        
         u.exit().remove()
     }
 });
