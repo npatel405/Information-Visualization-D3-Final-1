@@ -3,8 +3,8 @@
 var width = 800;
 var height = 630;
 
-var pwidth = 310;
-var pheight = 310;
+var pwidth = 600;
+var pheight = 330;
 var radius = 150;
 
 var lastSelectedDot = 5000;
@@ -340,12 +340,16 @@ d3.csv("colleges.csv", function(csv) {
         .innerRadius(0);
         
     var labelArc = d3.arc()
-        .outerRadius(radius - 100)
-        .innerRadius(radius - 100);
+        .outerRadius(radius)
+        .innerRadius(radius);
 
     var pie = d3.pie()
         .value(function(d) { return d.value; })
         .sort(function(a,b) { return d3.ascending(a.key, b.key); });
+
+    function midAngle(d){
+        return d.startAngle + (d.endAngle - d.startAngle)/2;
+    }
 
     function createPieChart(data) {
         console.log(data)
@@ -364,10 +368,34 @@ d3.csv("colleges.csv", function(csv) {
             .style("fill", function(d) { return piecolor(d.data.key); });
 
         pieArcs.append("text")
-            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
             .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + " %"; })
             .style("fill", "black");
-        
+
+        var text = pieChart.selectAll("text");
+
+        text.transition().duration(1000)
+            .attrTween("transform", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                    var d2 = interpolate(t);
+                    var pos = labelArc.centroid(d2);
+                    pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1) + (midAngle(d2) < Math.PI ? 5 : -5);
+                    return "translate("+ pos +")";
+                };
+            })
+            .styleTween("text-anchor", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                    var d2 = interpolate(t);
+                    return midAngle(d2) < Math.PI ? "start":"end";
+                };
+            });
+    
+        text.exit().remove();
         pieArcs.exit().remove();
     };
 
@@ -381,11 +409,7 @@ d3.csv("colleges.csv", function(csv) {
 
         pieChart.exit().remove();
 
-        function midAngle(d){
-            return d.startAngle + (d.endAngle - d.startAngle)/2;
-        }
-
-        var text = 
+        var text = pieChart.selectAll("text");
     
         text.transition().duration(1000)
             .attrTween("transform", function(d) {
@@ -394,8 +418,8 @@ d3.csv("colleges.csv", function(csv) {
                 this._current = interpolate(0);
                 return function(t) {
                     var d2 = interpolate(t);
-                    var pos = outerArc.centroid(d2);
-                    pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+                    var pos = labelArc.centroid(d2);
+                    pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1) + (midAngle(d2) < Math.PI ? 5 : -5);
                     return "translate("+ pos +")";
                 };
             })
