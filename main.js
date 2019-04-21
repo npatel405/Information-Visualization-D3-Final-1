@@ -151,7 +151,7 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
             d3.select("#admRate").text(function(k) { 
                 if (d["Admission Rate"] != 0) {
-                    return (Math.round((d["Admission Rate"] * 100))/100 + " %");
+                    return (Math.round((d["Admission Rate"] * 100))/100 + "%");
                 } else {
                     return "No value given";
                 } 
@@ -351,6 +351,15 @@ d3.csv("colleges.csv", function(csv) {
         return d.startAngle + (d.endAngle - d.startAngle)/2;
     }
 
+    // Animation function for pie chart pieces
+    function arcTween(a) {
+        var i = d3.interpolate(this._current, a);
+        this._current = i(0);
+        return function(t) {
+            return arc(i(t));
+        };
+    }
+
     function createPieChart(data) {
         console.log(data)
         var readydata0 = pie(d3.entries(data));
@@ -360,19 +369,24 @@ d3.csv("colleges.csv", function(csv) {
             .enter().append("g")
             .attr("class", "arc");
 
+        // Add pieces of pie chart
         pieArcs.append("path")
             .attr("d", arc)
             .attr("stroke", "black")
+            .each(function(d) { this._current = d; })
             .style("stroke-width", "1px")
             .style("opacity", 1)
             .style("fill", function(d) { return piecolor(d.data.key); });
 
+        // Add text around pie chart
         pieArcs.append("text")
-            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + " %"; })
+            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + "%"; })
+            .each(function(d) { this._current = d; })
             .style("fill", "black");
 
         var text = pieChart.selectAll("text");
 
+        // Move text into the appropriate place
         text.transition().duration(1000)
             .attrTween("transform", function(d) {
                 this._current = this._current || d;
@@ -396,21 +410,25 @@ d3.csv("colleges.csv", function(csv) {
             });
     
         text.exit().remove();
-        pieArcs.exit().remove();
+        pieChart.exit().remove();
     };
 
     function updatePie(data) {
         console.log(data)
         var readydata1 = pie(d3.entries(data));
-	    path = d3.select("#piechart").selectAll("path").data(readydata1); // Compute the new angles
-	    path.attr("d", arc); // redrawing the path
-        pieChart.selectAll("text").data(readydata1).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + "%"; })
+        // Compute the new angles
+        path = d3.select("#piechart").selectAll("path").data(readydata1);
+        // Smooth path transition with arcTween
+        path.transition().duration(500).attrTween("d", arcTween);
+        // Update text
+        pieChart.selectAll("text").data(readydata1)
+            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + "%"; });
 
         pieChart.exit().remove();
 
         var text = pieChart.selectAll("text");
     
+        // Smoothly move text
         text.transition().duration(1000)
             .attrTween("transform", function(d) {
                 this._current = this._current || d;
