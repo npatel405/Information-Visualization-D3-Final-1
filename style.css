@@ -16,17 +16,22 @@ body {
 }
 #chart2 {
 	float:left;
-	margin-top: 30px;
-	margin-left: 20px;
+    margin-left: 20px;
+    width: 400px;
+}
+#piechart {
+    float: right;
+	margin-top: 120px;
+	margin-right: 200px;
 }
 .xaxisdropdown {
     float: left;
-    clear: both;
+    clear: left;
     margin-left: 430px;
 }
 .xaxisbutton {
     float: left;
-    clear: both;
+    clear: left;
     margin-left: 475px;
     margin-top: 10px;
 }

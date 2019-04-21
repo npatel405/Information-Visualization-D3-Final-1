@@ -1,11 +1,11 @@
 // Samuel Shapiro & Nick Patel
 
-var width = 1000;
-var height = 600;
+var width = 800;
+var height = 630;
 
-var pwidth = 510;
-var pheight = 510;
-var radius = 250;
+var pwidth = 310;
+var pheight = 310;
+var radius = 150;
 
 var lastSelectedDot = 5000;
 var circleBorder = d3.rgb("#606060");
@@ -69,15 +69,15 @@ d3.csv("colleges.csv", function(csv) {
 
 
     // Axis scale setup
-    var yScale = d3.scaleLinear().domain(avgCostExtent).range([570, 30]);
-    var xScaleAct = d3.scaleLinear().domain(actMedExtent).range([50, 970]);
-    var xScaleSat = d3.scaleLinear().domain(satAvgExtent).range([50, 970]);
-    var xScaleAdm = d3.scaleLinear().domain(admRateExtent).range([50, 970]);
-    var xScaleFac = d3.scaleLinear().domain(avgFacSalExtent).range([50, 970]);
-    var xScaleFamAvg = d3.scaleLinear().domain(avgFamIncExtent).range([50, 970]);
-    var xScaleMean8 = d3.scaleLinear().domain(meanEarn8Extent).range([50, 970]);
-    var xScaleFamMed = d3.scaleLinear().domain(medFamIncExtent).range([50, 970]);
-    var xScaleDebt = d3.scaleLinear().domain(medDebtGradExtent).range([50, 970]);
+    var yScale = d3.scaleLinear().domain(avgCostExtent).range([600, 30]);
+    var xScaleAct = d3.scaleLinear().domain(actMedExtent).range([50, 770]);
+    var xScaleSat = d3.scaleLinear().domain(satAvgExtent).range([50, 770]);
+    var xScaleAdm = d3.scaleLinear().domain(admRateExtent).range([50, 770]);
+    var xScaleFac = d3.scaleLinear().domain(avgFacSalExtent).range([50, 770]);
+    var xScaleFamAvg = d3.scaleLinear().domain(avgFamIncExtent).range([50, 770]);
+    var xScaleMean8 = d3.scaleLinear().domain(meanEarn8Extent).range([50, 770]);
+    var xScaleFamMed = d3.scaleLinear().domain(medFamIncExtent).range([50, 770]);
+    var xScaleDebt = d3.scaleLinear().domain(medDebtGradExtent).range([50, 770]);
 
     // Axis setup
     var yAxis = d3.axisLeft().scale(yScale);
@@ -151,7 +151,7 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
             d3.select("#admRate").text(function(k) { 
                 if (d["Admission Rate"] != 0) {
-                    return (d["Admission Rate"] * 100 + " %");
+                    return (Math.round(100 * (d["Admission Rate"] * 100))/100 + " %");
                 } else {
                     return "No value given";
                 } 
@@ -322,7 +322,7 @@ d3.csv("colleges.csv", function(csv) {
      * 
      */
 
-     /*
+    /*
      *
      * BEGINNING OF CODE FOR SECOND GRAPH
      *
