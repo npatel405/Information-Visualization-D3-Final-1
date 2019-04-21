@@ -16,7 +16,7 @@ var piecolor = d3.scaleOrdinal()
 
 var xAxisValArr = ["ACT Median", "SAT Average", "Admission Rate", "Average Faculty Salary",
     "Average Family Income", "Mean Earnings 8 years After Entry", "Median Family Income",
-    "Median Debt on Graduation"]
+    "Median Debt on Graduation"];
 
 // Variable to represent the name of the currently selected axis
 var selectedXAxisName = "Average Family Income";
@@ -167,7 +167,7 @@ d3.csv("colleges.csv", function(csv) {
             diversity = {"% White": whitepercent,"% Black": blackpercent, "% Hispanic":hispanicpercent, "% Asian": asianpercent, "% American Indian": americanpercent, "% Pacific Islanders": pacificpercent, 
                 "% Biracial": bipercent, "% Nonresident": nonpercent, "% Other": other};
             createPieChart(diversity);
-            other=0;
+            other = 0;
 
         });
 
@@ -210,7 +210,7 @@ d3.csv("colleges.csv", function(csv) {
         .attr("id", "xaxislabel")
         .attr("class", "xaxisdropdown")
         .style("border", "1px solid black")
-        .on('change', chart1OnChange)
+        .on('change', chart1OnChange);
 
     // Fill dropdown with colors
     var options = select
@@ -262,7 +262,8 @@ d3.csv("colleges.csv", function(csv) {
         }
     }
 
-    var xAxisButton = d3.select("#wrapper")
+    // Add x-axis button
+    d3.select("#wrapper")
         .append("button")
         .attr("class", "xaxisbutton")
         .style("border", "1px solid black")
@@ -308,12 +309,20 @@ d3.csv("colleges.csv", function(csv) {
      * END OF CODE FOR FIRST GRAPH
      * 
      */
+
+     /*
+     *
+     * BEGINNING OF CODE FOR SECOND GRAPH
+     *
+     */
+
     var svg = d3.select('#piechart')
         .append("svg")
             .attr("width", pwidth)
             .attr("height", pheight)
         .append("g")
             .attr("transform", "translate(" + pwidth / 2 + "," + pheight / 2 + ")");
+
     function createPieChart(data) {
         console.log(data)
         var pie = d3.pie()
@@ -323,10 +332,9 @@ d3.csv("colleges.csv", function(csv) {
         console.log(data);
         console.log(readydata);
         var u = svg.selectAll("path")
-            .data(readydata)
+            .data(readydata);
 
-        u
-            .enter()
+        u.enter()
             .append('path')
                 .attr("slice", true)
             .merge(u)
@@ -339,7 +347,7 @@ d3.csv("colleges.csv", function(csv) {
             .attr('fill', function(d){ return(piecolor(d.data.key)) })
             .attr("stroke", "black")
             .style("stroke-width", "2px")
-            .style("opacity", 1)
+            .style("opacity", 1);
 
             u.selectAll("#slice")
                 .append("text")
@@ -349,6 +357,12 @@ d3.csv("colleges.csv", function(csv) {
                 .text(function(d) { return d.data.key;})
                 .style("fill", "#fff");
         
-        u.exit().remove()
+        u.exit().remove();
     }
+
+    /*
+     * 
+     * END OF CODE FOR SECOND GRAPH
+     * 
+     */
 });
