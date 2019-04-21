@@ -3,8 +3,17 @@
 var width = 1000;
 var height = 600;
 
+var pwidth = 500;
+var pheight = 500;
+var radius = 250;
+
 var lastSelectedDot = 5000;
 var circleBorder = d3.rgb("#606060");
+
+var piecolor = d3.scaleOrdinal()
+    .domain(["% White", "% Black", "% Hispanic", "% Asian", "% American Indian", "% Pacific Islander", "% Biracial", "% Nonresident", "% Mixed/Other"])
+    .range(["#e8eaf6","#c5cae9", "#9fa8da", "#7986cb","#5c6bc0", "#3f51b5", "#3949ab", "#303f9f", "#1a237e"]);
+    //.range(d3.schemeDark2);
 
 var xAxisValArr = ["ACT Median", "SAT Average", "Admission Rate", "Average Faculty Salary",
     "Average Family Income", "Mean Earnings 8 years After Entry", "Median Family Income",
@@ -24,6 +33,16 @@ d3.csv("colleges.csv", function(csv) {
         csv[i]["Mean Earnings 8 years After Entry"] = Number(csv[i]["Mean Earnings 8 years After Entry"]);
         csv[i]["Median Family Income"] = Number(csv[i]["Median Family Income"]);
         csv[i]["Median Debt on Graduation"] = Number(csv[i]["Median Debt on Graduation"]);
+        csv[i]["White"] = Number(csv[i]["% White"])*100;
+        csv[i]["Black"] = Number(csv[i]["% Black"])*100;
+        csv[i]["Hispanic"] = Number(csv[i]["% Hispanic"])*100;
+        csv[i]["Asian"] = Number(csv[i]["% Asian"])*100;
+        csv[i]["American"] = Number(csv[i]["% American Indian"])*100;
+        csv[i]["PacificIslander"] = Number(csv[i]["% Pacific Islander"])*100;
+        csv[i]["Biracial"] = Number(csv[i]["% Biracial"])*100;
+        csv[i]["NonresidentAliens"] = Number(csv[i]["% Nonresident Aliens"])*100;
+        csv[i]["Mixed"] = (1 - (Number(csv[i]["% Nonresident Aliens"]) + Number(csv[i]["% Biracial"]) + Number(csv[i]["% Pacific Islander"]) + Number(csv[i]["% American Indian"]) + 
+            Number(csv[i]["% Asian"]) + Number(csv[i]["% Hispanic"]) + Number(csv[i]["% Black"]) + Number(csv[i]["% White"])))*100;
     }
 
     var avgCostExtent = d3.extent(csv, function(row) { return row["Average Cost"]; });
@@ -35,6 +54,18 @@ d3.csv("colleges.csv", function(csv) {
     var meanEarn8Extent = d3.extent(csv, function(row) { return row["Mean Earnings 8 years After Entry"]; });
     var medFamIncExtent = d3.extent(csv, function(row) { return row["Median Family Income"]; });
     var medDebtGradExtent = d3.extent(csv, function(row) { return row["Median Debt on Graduation"]; });
+
+    var whitepercent = 0;
+    var blackpercent = 0;
+    var hispanicpercent = 0;
+    var asianpercent = 0;
+    var americanpercent = 0;
+    var pacificpercent = 0;
+    var bipercent = 0;
+    var nonpercent = 0;
+    var mixed = 0;
+    var diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islanders","percentage": pacificpercent}, 
+        {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Mixed/Other","percentage": mixed}];
 
 
     // Axis scale setup
@@ -125,6 +156,23 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#medFamInc").text(function(k) { return hasField(d, "Median Family Income"); });
             d3.select("#medDebtGrad").text(function(k) { return hasField(d, "Median Debt on Graduation"); });
             lastSelectedDot = i;
+            console.log(this);
+            // console.log(d.Mixed);
+            whitepercent = d.White;
+            blackpercent = d.Black;
+            hispanicpercent = d.Hispanic;
+            asianpercent = d.Asian;
+            americanpercent = d.American;
+            pacificpercent = d.PacificIslander;
+            bipercent = d.Biracial;
+            nonpercent = d.NonresidentAliens;
+            mixed = d.Mixed;
+            diversity = {"% White": whitepercent,"% Black": blackpercent, "% Hispanic":hispanicpercent, "% Asian": asianpercent, "% American Indian": americanpercent, "% Pacific Islanders": pacificpercent, 
+                "% Biracial": bipercent, "% Nonresident": nonpercent, "% Mixed/Other": mixed};
+            // diversity = [{"category":"% White","percentage": whitepercent},{"category":"% Black","percentage": blackpercent}, {"category":"% Hispanic","percentage":hispanicpercent},{"category":"% Asian","percentage": asianpercent},{"category":"% American Indian","percentage": americanpercent},{"category": "% Pacific Islanders","percentage": pacificpercent}, 
+            //     {"category":"% Biracial","percentage": bipercent},{"category":"% Nonresident","percentage": nonpercent},{"category": "% Mixed/Other","percentage": mixed}];
+            createPieChart(diversity);
+
         });
 
 
@@ -264,4 +312,39 @@ d3.csv("colleges.csv", function(csv) {
      * END OF CODE FOR FIRST GRAPH
      * 
      */
+    var svg = d3.select('#piechart')
+        .append("svg")
+            .attr("width", pwidth)
+            .attr("height", pheight)
+        .append("g")
+            .attr("transform", "translate(" + pwidth / 2 + "," + pheight / 2 + ")");
+    function createPieChart(data) {
+        console.log(data)
+        var pie = d3.pie()
+            .value(function(d) {return d.value; })
+            .sort(function(a,b) {return d3.ascending(a.key, b.key);})
+        var readydata = pie(d3.entries(data))
+        console.log(data);
+        console.log(readydata);
+        var u = svg.selectAll("path")
+            .data(readydata)
+
+        u
+            .enter()
+            .append('path')
+            .merge(u)
+            .transition()
+            .duration(1000)
+            .attr('d', d3.arc()
+                .innerRadius(0)
+                .outerRadius(radius)
+            )
+            .attr('fill', function(d){ return(piecolor(d.data.key)) })
+            .attr("stroke", "white")
+            .style("stroke-width", "2px")
+            .style("opacity", 1)
+            .text(function(d){return d.data.key})
+
+        u.exit().remove()
+    }
 });
