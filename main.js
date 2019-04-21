@@ -27,7 +27,7 @@ d3.csv("colleges.csv", function(csv) {
         csv[i]["Average Cost"] = Number(csv[i]["Average Cost"]);
         csv[i]["ACT Median"] = Number(csv[i]["ACT Median"]);
         csv[i]["SAT Average"] = Number(csv[i]["SAT Average"]);
-        csv[i]["Admission Rate"] = Number(csv[i]["Admission Rate"]);
+        csv[i]["Admission Rate"] = Number(csv[i]["Admission Rate"])*100;
         csv[i]["Average Faculty Salary"] = Number(csv[i]["Average Faculty Salary"]);
         csv[i]["Average Family Income"] = Number(csv[i]["Average Family Income"]);
         csv[i]["Mean Earnings 8 years After Entry"] = Number(csv[i]["Mean Earnings 8 years After Entry"]);
@@ -151,7 +151,7 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
             d3.select("#admRate").text(function(k) { 
                 if (d["Admission Rate"] != 0) {
-                    return (Math.round(100 * (d["Admission Rate"] * 100))/100 + " %");
+                    return (Math.round((d["Admission Rate"] * 100))/100 + " %");
                 } else {
                     return "No value given";
                 } 
@@ -365,8 +365,8 @@ d3.csv("colleges.csv", function(csv) {
 
         pieArcs.append("text")
             .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-            .text(function(d) { return d.data.key;})
-            .style("fill", "#fff");
+            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + " %"; })
+            .style("fill", "black");
         
         pieArcs.exit().remove();
     };
@@ -376,7 +376,40 @@ d3.csv("colleges.csv", function(csv) {
         var readydata1 = pie(d3.entries(data));
 	    path = d3.select("#piechart").selectAll("path").data(readydata1); // Compute the new angles
 	    path.attr("d", arc); // redrawing the path
-	    pieChart.selectAll("text").data(readydata1).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; });
+        pieChart.selectAll("text").data(readydata1).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+            .text(function(d) { return d.data.key + " - " + (Math.round((d.data.value * 100))/100) + "%"; })
+
+        pieChart.exit().remove();
+
+        function midAngle(d){
+            return d.startAngle + (d.endAngle - d.startAngle)/2;
+        }
+
+        var text = 
+    
+        text.transition().duration(1000)
+            .attrTween("transform", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                    var d2 = interpolate(t);
+                    var pos = outerArc.centroid(d2);
+                    pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+                    return "translate("+ pos +")";
+                };
+            })
+            .styleTween("text-anchor", function(d) {
+                this._current = this._current || d;
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                    var d2 = interpolate(t);
+                    return midAngle(d2) < Math.PI ? "start":"end";
+                };
+            });
+    
+        text.exit().remove();
     }
     
     /*
