@@ -149,7 +149,13 @@ d3.csv("colleges.csv", function(csv) {
             d3.select("#avgCost").text(function(k) { return hasField(d, "Average Cost"); });
             d3.select("#actMed").text(function(k) { return hasField(d, "ACT Median"); });
             d3.select("#satAvg").text(function(k) { return hasField(d, "SAT Average"); });
-            d3.select("#admRate").text(function(k) { return hasField(d, "Admission Rate"); });
+            d3.select("#admRate").text(function(k) { 
+                if (d["Admission Rate"] != 0) {
+                    return (d["Admission Rate"] * 100 + " %");
+                } else {
+                    return "No value given";
+                } 
+            });
             d3.select("#avgFacSal").text(function(k) { return hasField(d, "Average Faculty Salary"); });
             d3.select("#avgFamInc").text(function(k) { return hasField(d, "Average Family Income"); });
             d3.select("#meanEarn8").text(function(k) { return hasField(d, "Mean Earnings 8 years After Entry"); });
