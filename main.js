@@ -343,6 +343,7 @@ d3.csv("colleges.csv", function(csv) {
         .outerRadius(radius)
         .innerRadius(radius);
 
+    // Function to sort sections of the pie chart
     var pie = d3.pie()
         .value(function(d) { return d.value; })
         .sort(function(a,b) { return d3.ascending(a.key, b.key); });
@@ -360,6 +361,7 @@ d3.csv("colleges.csv", function(csv) {
         };
     }
 
+    // Create initial pie chart
     function createPieChart(data) {
         console.log(data)
         var readydata0 = pie(d3.entries(data));
@@ -413,6 +415,7 @@ d3.csv("colleges.csv", function(csv) {
         pieChart.exit().remove();
     };
 
+    // Update the pie chart
     function updatePie(data) {
         console.log(data)
         var readydata1 = pie(d3.entries(data));
